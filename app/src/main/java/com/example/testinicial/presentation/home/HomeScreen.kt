@@ -160,3 +160,66 @@ fun VehicleCard(vehicle: Vehicle, onClick: (Vehicle) -> Unit) {
         }
     }
 }
+
+@Composable
+fun ReservationDialog(vehicle: Vehicle, onDismiss: () -> Unit) {
+    var showSuccessDialog by remember { mutableStateOf(false) }
+
+    if (showSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = { showSuccessDialog = false; onDismiss() },
+            title = { Text("Reserva exitosa") },
+            text = { Text("Has reservado el vehículo satisfactoriamente.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showSuccessDialog = false
+                    onDismiss()
+                }) {
+                    Text("Aceptar")
+                }
+            }
+        )
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                SharedTripState.reservedTrip.value = ReservedTrip(
+                    vehicleImage = vehicle.image,
+                    destination = vehicle.destination,
+                    vehicleName = vehicle.name,
+                    vehicleModel = vehicle.model,
+                    vehicleYear = vehicle.year
+                )
+                showSuccessDialog = true
+            }) {
+                Text("Confirmar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        },
+        title = {
+            Text("${vehicle.name} ${vehicle.model}")
+        },
+        text = {
+            Column {
+                Image(
+                    painter = vehicle.image,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Destino: ${vehicle.destination}")
+                Text("Año: ${vehicle.year}")
+                Text("Tarifa estimada: $8.000")
+            }
+        }
+    )
+}
+
